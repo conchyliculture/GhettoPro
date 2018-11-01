@@ -1,41 +1,29 @@
-"""Main loop"""
+"""Module for a GhettoPro class"""
 import usocket
 import utime
 import machine
 import network
 
-
-class LED():
-  """Class for a LED"""
-
-  def __init__(self, pin):
-    self.led = machine.Pin(pin, machine.Pin.OUT)
-    self.value = False
-
-  def Toggle(self):
-    """Toggles LED state"""
-    self.value = not self.value
-    self.led.value(self.value)
-
-  def Blink(self):
-    """Blinks LED"""
-    self.led.value(1)
-    utime.sleep_us(100)
-    self.led.value(0)
+from led import LED
 
 
-class GoPro():
-  """Main woker class"""
+class GhettoPro():
+  """GhettoPro class"""
 
-  GOPRO_IP = '10.5.5.9'
+  CAMERA_IP = '10.5.5.9'
 
+  MODE_BTN_INTERVAL_MS = 400
   SHUTTER_INTERVAL_MS = 1000
-  SLEEP_INTERVAL_MS = 20
+  MAIN_LOOP_SLEEP_INTERVAL_MS = 20
 
-  def __init__(self, wifi_essid=None, wifi_password=None, trigger_pin=None):
+  def __init__(
+      self, wifi_essid=None, wifi_password=None, trigger_pin=None,
+      next_mode_pin=None, prev_mode_pin=None):
     self.wifi_essid = wifi_essid
     self.wifi_password = wifi_password
     self.trigger_pin = trigger_pin
+    self.next_mode_pin = next_mode_pin
+    self.prev_mode_pin = prev_mode_pin
 
     self.status_led = None
     self._trigger_btn = None
@@ -81,7 +69,7 @@ class GoPro():
         }[i]
 
   def _ConnectWifi(self):
-    self.Log('Setting up WiFi to GoPro')
+    self.Log('Setting up WiFi')
     if not self.wlan:
       self.wlan = network.WLAN(network.STA_IF)
       self.wlan.active(True)
@@ -113,10 +101,10 @@ class GoPro():
       return
     try:
       socket = usocket.socket()
-      socket.connect(usocket.getaddrinfo(self.GOPRO_IP, 80)[0][-1])
+      socket.connect(usocket.getaddrinfo(self.CAMERA_IP, 80)[0][-1])
       http_query = 'GET {0} HTTP/1.1\r\n'.format(path)
       self.Debug('Sending '+http_query)
-      http_query += 'Host: {0}\r\n\r\n'.format(self.GOPRO_IP)
+      http_query += 'Host: {0}\r\n\r\n'.format(self.CAMERA_IP)
       socket.write(http_query)
       utime.sleep_ms(500)
       socket.close()
@@ -152,7 +140,7 @@ class GoPro():
   def _Loop(self):
     self.Log('Looping')
     while True:
-      utime.sleep_ms(self.SLEEP_INTERVAL_MS)
+      utime.sleep_ms(self.MAIN_LOOP_SLEEP_INTERVAL_MS)
 
   def Debug(self, msg):
     """Prints a debug message."""
