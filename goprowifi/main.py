@@ -7,8 +7,8 @@ CAMERA_MODEL = HeroFive()
 ESSID = 'GP12345678' # Wifi name
 PWD = 'cul120345' # Wifi Password
 TRIGGER_PIN = 4 # The pin number for the trigger switch
-NEXT_MODE_PIN = None # The pin number for the 'Next mode' switch
-PREV_MODE_PIN = None # The pin number for the 'Previous mode' switch
+NEXT_MODE_PIN = None # (Optional) The pin number for the 'Next mode' switch
+PREV_MODE_PIN = None # (Optional) The pin number for the 'Previous mode' switch
 DEBUG = True # Whether to display debug messages
 # End config
 
