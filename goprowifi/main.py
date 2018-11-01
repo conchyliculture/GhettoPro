@@ -1,7 +1,9 @@
 """Main module, called by MicroPython"""
 from ghettopro import GhettoPro
+from cameras.session import HeroFive
 
 # Edit config here
+CAMERA_MODEL = HeroFive()
 ESSID = 'GP12345678' # Wifi name
 PWD = 'cul120345' # Wifi Password
 TRIGGER_PIN = 4 # The pin number for the trigger switch
@@ -11,6 +13,7 @@ DEBUG = True # Whether to display debug messages
 # End config
 
 gp = GhettoPro(
+    camera=CAMERA_MODEL,
     wifi_essid=ESSID,
     wifi_password=PWD,
     trigger_pin=TRIGGER_PIN,
