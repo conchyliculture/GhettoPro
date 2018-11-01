@@ -27,7 +27,7 @@ Also use your camera model (currently only Hero Session 5 supported).
 ```
 source bin/activate
 pip install rshell
-rshell --port /dev/ttyUSB0 rsync -m  goprowifi /pyboard
+rshell --port /dev/ttyUSB0 rsync -m  ghettopro /pyboard
 ```
 
 And voila!
