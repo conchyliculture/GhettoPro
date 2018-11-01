@@ -16,6 +16,11 @@ class GhettoPro():
   SHUTTER_INTERVAL_MS = 1000
   MAIN_LOOP_SLEEP_INTERVAL_MS = 20
 
+  MODE_PHOTO = 'PHOTO'
+  MODE_BURST = 'BURST'
+  MODE_VIDEO = 'VIDEO'
+  CAMERA_MODES = frozenset([MODE_PHOTO, MODE_BURST, MODE_VIDEO])
+
   def __init__(
       self, wifi_essid=None, wifi_password=None, trigger_pin=None,
       next_mode_pin=None, prev_mode_pin=None, debug=False):
@@ -28,9 +33,34 @@ class GhettoPro():
 
     self.status_led = None
     self._trigger_btn = None
+    self._prev_mode_btn = None
+    self._next_mode_btn = None
     self.wlan = None
     self._socket = None
     self._last_shutter = utime.ticks_ms()
+    self._last_mode_change = utime.ticks_ms()
+    self._current_mode = 0
+
+  def _PrevCameraMode(self):
+    self._current_mode = (self._current_mode + 1)%(self.CAMERA_MODES)
+    self._SetCameraMode(self._current_mode)
+
+  def _NextCameraMode(self):
+    self._current_mode = (self._current_mode - 1)%(self.CAMERA_MODES)
+    self._SetCameraMode(self._current_mode)
+
+  def _ModeWheelCallback(self, pin):
+    self.Debug('ModeWheel triggered for pin {0!s}'.format(pin))
+    ticks_now = utime.ticks_ms()
+    ticks_diff = utime.ticks_diff(ticks_now, self._last_mode_change)
+    if ticks_diff > self.MODE_BTN_INTERVAL_MS:
+      if str(pin) == 'Pin({0:d})'.format(self.prev_mode_pin):
+        self._PrevCameraMode()
+      if str(pin) == 'Pin({0:d})'.format(self.next_mode_pin):
+        self._NextCameraMode()
+      self._last_mode_change = utime.ticks_ms()
+    else:
+      self.Debug('ModeWheel triggered too soon ({0:d})'.format(ticks_diff))
 
   def _TriggerCallback(self, pin):
     self.Debug('Trigger called for pin {0!s}'.format(pin))
@@ -39,6 +69,7 @@ class GhettoPro():
       ticks_diff = utime.ticks_diff(ticks_now, self._last_shutter)
       if ticks_diff > self.SHUTTER_INTERVAL_MS:
         self._Shutter()
+        self._last_shutter = utime.ticks_ms()
       else:
         self.Debug('Shutter too soon ({0:d})'.format(ticks_diff))
 
@@ -49,6 +80,18 @@ class GhettoPro():
     self._trigger_btn.irq(
         trigger=machine.Pin.IRQ_FALLING,
         handler=self._TriggerCallback)
+
+    if self.next_mode_pin:
+      self._next_mode_btn = machine.Pin(self.next_mode_pin, machine.Pin.IN)
+      self._next_mode_btn.irq(
+          trigger=machine.Pin.IRQ_FALLING,
+          handler=self._ModeWheelCallback)
+
+    if self.prev_mode_pin:
+      self._prev_mode_btn = machine.Pin(self.prev_mode_pin, machine.Pin.IN)
+      self._prev_mode_btn.irq(
+          trigger=machine.Pin.IRQ_FALLING,
+          handler=self._ModeWheelCallback)
 
   def _ESSIDSeen(self):
     scan_result = self.wlan.scan()
@@ -124,19 +167,33 @@ class GhettoPro():
   def _Shutter(self):
     self.Log('Shutter!')
     self._Get('/gp/gpControl/command/shutter?p=1')
-    self._last_shutter = utime.ticks_ms()
+
+  def _SetVideoMode(self):
+    self._Get('/gp/gpControl/command/mode?p=0')
 
   def _SetPhotoMode(self):
     self._Get('/gp/gpControl/command/mode?p=1')
 
+  def _SetBurstMode(self):
+    self._Get('/gp/gpControl/command/mode?p=2')
+
   def _Set4KResolution(self):
     self._Get('/gp/gpControl/setting/2/1')
+
+  def _SetCameraMode(self, mode):
+    self.Debug('Setting camera mode: '+self.CAMERA_MODES[mode])
+    self._Set4KResolution() # Delicious 4K
+    if self.CAMERA_MODES[mode] == self.MODE_PHOTO:
+      self._SetPhotoMode()
+    if self.CAMERA_MODES[mode] == self.MODE_BURST:
+      self._SetBurstMode()
+    if self.CAMERA_MODES[mode] == self.MODE_VIDEO:
+      self._SetVideoMode()
 
   def _ConfigureCamera(self):
     self.Log('Configuring Camera : Photo mode & 4k')
     self._Connected()
-    self._SetPhotoMode()
-    self._Set4KResolution()
+    self._SetCameraMode(self._current_mode)
 
   def _Loop(self):
     self.Log('Looping')
