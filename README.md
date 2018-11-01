@@ -23,5 +23,5 @@ Look at your camera's manual about how to setup wifi, and get the ESSID and pass
 ```
 source bin/activate
 pip install rshell
-rshell --port /dev/ttyUSB0 cp goprowifi/* /pyboard/
+rshell --port /dev/ttyUSB0 rsync -m  goprowifi /pyboard
 ```
