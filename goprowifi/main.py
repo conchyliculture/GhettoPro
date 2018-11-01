@@ -7,6 +7,7 @@ PWD = 'cul120345' # Wifi Password
 TRIGGER_PIN = 4 # The pin number for the trigger switch
 NEXT_MODE_PIN = None # The pin number for the 'Next mode' switch
 PREV_MODE_PIN = None # The pin number for the 'Previous mode' switch
+DEBUG = True # Whether to display debug messages
 # End config
 
 gp = GhettoPro(
@@ -14,6 +15,7 @@ gp = GhettoPro(
     wifi_password=PWD,
     trigger_pin=TRIGGER_PIN,
     next_mode_pin=NEXT_MODE_PIN,
-    prev_mode_pin=PREV_MODE_PIN)
+    prev_mode_pin=PREV_MODE_PIN,
+    debug=DEBUG)
 
 gp.Main()

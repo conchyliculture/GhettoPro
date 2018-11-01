@@ -18,12 +18,13 @@ class GhettoPro():
 
   def __init__(
       self, wifi_essid=None, wifi_password=None, trigger_pin=None,
-      next_mode_pin=None, prev_mode_pin=None):
+      next_mode_pin=None, prev_mode_pin=None, debug=False):
     self.wifi_essid = wifi_essid
     self.wifi_password = wifi_password
     self.trigger_pin = trigger_pin
     self.next_mode_pin = next_mode_pin
     self.prev_mode_pin = prev_mode_pin
+    self.debug = debug
 
     self.status_led = None
     self._trigger_btn = None
@@ -144,7 +145,8 @@ class GhettoPro():
 
   def Debug(self, msg):
     """Prints a debug message."""
-    self.Log('DEBUG '+msg)
+    if self.debug:
+      self.Log('DEBUG '+msg)
 
   def Log(self, msg):
     """prints a message"""
