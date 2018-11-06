@@ -26,7 +26,7 @@ class GhettoPro():
 
   def __init__(
       self, camera=None, wifi_essid=None, wifi_password=None, trigger_pin=None,
-      next_mode_pin=None, prev_mode_pin=None, debug=False):
+      next_mode_pin=None, prev_mode_pin=None, status_led_pin=None, debug=False):
     """Initializes a GhettoPro instance.
 
     Args:
@@ -36,6 +36,7 @@ class GhettoPro():
       trigger_pin(int): the pin number for the shutter button.
       next_mode_pin(int): the pin number for the next mode button.
       prev_mode_pin(int): the pin number for the previous mode button.
+      status_led_pin(int): the pin number for the status LED.
       debug(bool): Whether to display debug messages.
     """
     self.camera = camera
@@ -143,7 +144,8 @@ class GhettoPro():
   def _ConfigureBoard(self):
     """Initializes the board."""
     Log('Configuring board')
-    self._status_led = LED(15)
+    if self.status_led_pin:
+      self._status_led = LED(self.status_led_pin)
     self._trigger_btn = machine.Pin(self.trigger_pin, machine.Pin.IN)
     self._trigger_btn.irq(
         trigger=machine.Pin.IRQ_FALLING,
@@ -168,18 +170,19 @@ class GhettoPro():
       self._wlan = network.WLAN(network.STA_IF)
       self._wlan.active(True)
     while not self._ESSIDSeen():
+      self.Blink()
       self._wlan.disconnect()
       self._wlan.active(False)
       utime.sleep(1)
       self._wlan.active(True)
     self._wlan.connect(self.wifi_essid, self.wifi_password)
     while not self._wlan.isconnected():
+      self.Blink(nb=2)
       self.Debug('Trying to connect with Auth : {0} {1}'.format(
           self.wifi_essid, self.wifi_password))
       while self._wlan.status() == network.STAT_CONNECTING:
         self.Debug('Status: '+self._ToStatus(self._wlan.status()))
         utime.sleep_ms(500)
-        self._status_led.Blink()
       self.Debug('Status: '+self._ToStatus(self._wlan.status()))
       utime.sleep(1)
     Log(self._wlan.ifconfig())
@@ -197,6 +200,11 @@ class GhettoPro():
     self.Debug('Set 4k resolution')
     self._Get(self.camera.CAMERA_4K_RESOLUTION_URL)
 
+  def Blink(self, nb=1):
+    """Blink the status led if present."""
+    if self._status_led:
+      self._status_led.Blink(nb=nb)
+
   def _Loop(self):
     Log('All done, looping...')
     while True:
@@ -212,7 +220,9 @@ class GhettoPro():
     utime.sleep(1)
     self.Debug('Main starting')
     self._ConfigureBoard()
+    self.Blink(nb=2)
     self._ConnectWifi()
+    self.Blink(nb=3)
     self._ConfigureCamera()
 
     self._Loop()
