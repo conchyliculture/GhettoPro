@@ -16,8 +16,12 @@ class LED():
     self.value = not self.value
     self.led.value(self.value)
 
-  def Blink(self):
+  def Blink(self, nb=1):
     """Blinks LED"""
-    self.led.value(1)
-    utime.sleep_us(100)
-    self.led.value(0)
+    i = 0
+    while i < nb:
+      self.led.value(0)
+      utime.sleep_ms(1)
+      self.led.value(1)
+      utime.sleep_ms(50)
+      i += 1
