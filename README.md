@@ -40,3 +40,7 @@ and your camera should beep, which says GhettoPro was able to connect successful
 Be careful not to change the mode of your camera into something else (ie: Video mode), otherwise GhettoPro will be confused.
 
 Press the shutter button to take a picture!
+
+## Troubleshooting
+
+I realized that it happens quite a lot that the module will connect to wifi, but will be unable to open a socket to the camera. The only way I found to reset that is to "Reset connections" on it (which will change the WiFi password).
