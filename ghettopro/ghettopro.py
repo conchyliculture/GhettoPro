@@ -24,7 +24,7 @@ class GhettoPro():
   MAIN_LOOP_SLEEP_INTERVAL_MS = 20
 
   def __init__(
-      self, camera=None, wifi_essid=None, wifi_password=None, trigger_pin=None,
+      self, camera=None, wifi_essid=None, wifi_password=None, shutter_pin=None,
       next_mode_pin=None, prev_mode_pin=None, status_led_pin=None, debug=False):
     """Initializes a GhettoPro instance.
 
@@ -32,7 +32,7 @@ class GhettoPro():
       camera(cameras.Camera): an instance of a Camera object.
       wifi_essid(str): the WiFi ESSID.
       wifi_password(str): the WiFi password.
-      trigger_pin(int): the pin number for the shutter button.
+      shutter_pin(int): the pin number for the shutter button.
       next_mode_pin(int): the pin number for the next mode button.
       prev_mode_pin(int): the pin number for the previous mode button.
       status_led_pin(int): the pin number for the status LED.
@@ -41,7 +41,7 @@ class GhettoPro():
     self.camera = camera
     self.wifi_essid = wifi_essid
     self.wifi_password = wifi_password
-    self.trigger_pin = trigger_pin
+    self.shutter_pin = shutter_pin
     self.next_mode_pin = next_mode_pin
     self.prev_mode_pin = prev_mode_pin
     self.debug = debug
@@ -52,7 +52,7 @@ class GhettoPro():
     self._next_mode_btn = None
     self._prev_mode_btn = None
     self._status_led = None
-    self._trigger_btn = None
+    self._shutter_btn = None
     self._wlan = None
 
   ###################
@@ -74,10 +74,10 @@ class GhettoPro():
     else:
       self.Debug('ModeWheel triggered too soon ({0:d})'.format(ticks_diff))
 
-  def _TriggerCallback(self, pin):
+  def _ShutterCallback(self, pin):
     """Called when the board shutter button is pressed."""
     self.Debug('Trigger called for pin {0!s}'.format(pin))
-    if str(pin) == 'Pin({0:d})'.format(self.trigger_pin):
+    if str(pin) == 'Pin({0:d})'.format(self.shutter_pin):
       ticks_now = utime.ticks_ms()
       ticks_diff = utime.ticks_diff(ticks_now, self._last_shutter)
       if ticks_diff > self.SHUTTER_INTERVAL_MS:
@@ -147,10 +147,10 @@ class GhettoPro():
     Log('Configuring board')
     if self.status_led_pin:
       self._status_led = LED(self.status_led_pin)
-    self._trigger_btn = machine.Pin(self.trigger_pin, machine.Pin.IN)
-    self._trigger_btn.irq(
+    self._shutter_btn = machine.Pin(self.shutter_pin, machine.Pin.IN)
+    self._shutter_btn.irq(
         trigger=machine.Pin.IRQ_FALLING,
-        handler=self._TriggerCallback)
+        handler=self._ShutterCallback)
 
     if self.next_mode_pin:
       self._next_mode_btn = machine.Pin(self.next_mode_pin, machine.Pin.IN)
