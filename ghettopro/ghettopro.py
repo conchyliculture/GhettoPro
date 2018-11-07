@@ -171,6 +171,8 @@ class GhettoPro():
     Log('Setting up WiFi')
     if not self._wlan:
       self._wlan = network.WLAN(network.STA_IF)
+      self._wlan.disconnect()
+      self._wlan.active(False)
       self._wlan.active(True)
     while not self._ESSIDSeen():
       self.Blink()
