@@ -118,14 +118,15 @@ class GhettoPro():
         5: 'STAT_GOT_IP – connection successful'
         }[i]
 
-  def _Get(self, path, retries=5):
+  def _Get(self, path, retries=1):
     """Sends a HTTP GET request"""
     if not (self._wlan and self._wlan.isconnected()):
       Log('Can not sent GET requests while wifi is not connected')
-      return
+      raise OSError()
     try:
       socket = usocket.socket()
       socket.connect(usocket.getaddrinfo(self.camera.CAMERA_IP, 80)[0][-1])
+      socket.settimeout(0.5)
       http_query = 'GET {0} HTTP/1.1\r\n'.format(path)
       self.Debug('Sending '+http_query)
       http_query += 'Host: {0}\r\n\r\n'.format(self.camera.CAMERA_IP)
@@ -136,6 +137,7 @@ class GhettoPro():
       if retries == 0:
         raise e
       else:
+        self.Debug('Connection failed, retrying...')
         self._Get(path, retries-1)
 
   ###################
