@@ -23,4 +23,8 @@ gp = GhettoPro(
     status_led_pin=STATUS_LED_PIN,
     debug=DEBUG)
 
-gp.Main()
+while True:
+  try:
+    gp.Main()
+  except OSError as e:
+    print(e)
