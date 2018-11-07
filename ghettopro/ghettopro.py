@@ -6,7 +6,6 @@ import network
 
 from led import LED
 
-
 def Log(msg):
   """prints a message"""
   print(msg)
@@ -46,6 +45,7 @@ class GhettoPro():
     self.next_mode_pin = next_mode_pin
     self.prev_mode_pin = prev_mode_pin
     self.debug = debug
+    self.status_led_pin = status_led_pin
 
     self._last_shutter = utime.ticks_ms()
     self._last_mode_change = utime.ticks_ms()
@@ -82,6 +82,7 @@ class GhettoPro():
       ticks_diff = utime.ticks_diff(ticks_now, self._last_shutter)
       if ticks_diff > self.SHUTTER_INTERVAL_MS:
         Log('Shutter!')
+        self.Blink()
         if self.camera.IsVideoMode():
           # We need to either say 'Start filming' or 'Stop filming'
           self._Get(self.camera.GetToggleShutterUrl())
