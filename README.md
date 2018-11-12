@@ -32,6 +32,8 @@ rshell --port /dev/ttyUSB0 rsync -m  ghettopro /pyboard
 
 Connect everything together and tape it to your arm for one hand operation!
 
+This shows only 1 button operation, to activate the shutter in picture mode:
+
 ![furry arm](pics/arm.jpg)
 
 ## Usage
