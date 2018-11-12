@@ -8,8 +8,8 @@ And also a code a bit cleaner, easier to extend.
 Partlist:
 
 * [LOLIN ESP8266 with integrated battery charging thing](https://www.aliexpress.com/item/WEMOS-D1-mini-Pro-16M-bytes-external-antenna-connector-ESP8266-WIFI-Internet-of-Things-development-board/32724692514.html)
-* [LiPo battery](https://www.aliexpress.com/item/2pcs-lot-Lithium-Lipo-Battery-3-7V-300mAh-With-Protective-Board-for-Bluetooth-Speaker-Digital-Products/32613895675.html) (wrong connector, though)
-* Some buttons
+* [LiPo battery](https://www.aliexpress.com/item/2pcs-lot-Lithium-Lipo-Battery-3-7V-300mAh-With-Protective-Board-for-Bluetooth-Speaker-Digital-Products/32613895675.html) (wrong connector, though) or the [other beefier option](https://eu.mouser.com/ProductDetail/TinyCircuits/ASR00008?qs=55YtniHzbhBpf4%2FGjN1RwA%3D%3D)
+* A couple tactile switches. Found out that [those work well for one hand operation](https://eu.mouser.com/ProductDetail/Diptronics/DTS-25R-V?qs=sGAEpiMZZMsgGjVA3toVBDU%2fPbf8wNFALRDFEq9dT%252bw%3d)
 
 ## Installation
 
@@ -30,7 +30,9 @@ pip install rshell
 rshell --port /dev/ttyUSB0 rsync -m  ghettopro /pyboard
 ```
 
-And voila!
+Connect everything together and tape it to your arm for one hand operation!
+
+[](pics/arm.jpg)
 
 ## Usage
 
