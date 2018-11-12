@@ -32,7 +32,7 @@ rshell --port /dev/ttyUSB0 rsync -m  ghettopro /pyboard
 
 Connect everything together and tape it to your arm for one hand operation!
 
-[](pics/arm.jpg)
+![furry arm](pics/arm.jpg)
 
 ## Usage
 
